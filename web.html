@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HayatoSound Comunity</title>
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        .text-shadow-lg {
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-clamp: 3;
+        }
+        .card-hover {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        [x-cloak] {
+            display: none !important;
+        }
+        .theme-dark {
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+            --text: #f3f4f6;
+            --bg: #111827;
+            --card-bg: #1f2937;
+            --border: #374151;
+            --text-secondary: #9ca3af;
+        }
+        .theme-light {
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+            --text: #111827;
+            --bg: #ffffff;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
+            --text-secondary: #6b7280;
+        }
+        .theme-classic {
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+            --text: #7c2d12;
+            --bg: #fff7ed;
+            --card-bg: #fff7ed;
+            --border: #fb923c;
+            --text-secondary: #ea580c;
+        }
+        .color-blue {
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+        }
+        .color-purple {
+            --primary: #a855f7;
+            --primary-dark: #9333ea;
+        }
+        .color-red {
+            --primary: #ef4444;
+            --primary-dark: #dc2626;
+        }
+        .color-pink {
+            --primary: #ec4899;
+            --primary-dark: #db2777;
+        }
+        .color-green {
+            --primary: #10b981;
+            --primary-dark: #059669;
+        }
+        .color-yellow {
+            --primary: #eab308;
+            --primary-dark: #ca8a04;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            box-shadow: 0 4px 6px -1px rgba(var(--primary-rgb), 0.3);
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        .active-section {
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(var(--primary-rgb), 0.5);
+        }
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .color-dot:hover {
+            transform: scale(1.2);
+        }
+        .color-dot.active {
+            border: 3px solid white;
+            transform: scale(1.1);
+        }
+        .image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #1f2937, #374151);
+            border: 2px dashed #6b7280;
+        }
+        .image-placeholder h4 {
+            font-weight: 600;
+            margin: 8px 0;
+        }
+        .image-placeholder p {
+            font-size: 0.875rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="theme-dark color-green" x-data="{
+    theme: 'dark',
+    language: 'es',
+    color: 'green',
+    menuOpen: false,
+    activeSection: 'home',
+    showScrollTop: false,
+    themeDropdown: false,
+    colorDropdown: false,
+    selectedPodcast: null,
+    showAllPodcasts: false, // # AÑADIDO: Variable para controlar el modal de todos los podcasts
+    activeComment: {},
+    commentUsername: '',
+    showUsernameModal: false,
+    commentTarget: null,
+    translations: {
+        es: {
+            home: 'Inicio',
+            podcasts: 'Podcasts',
+            interviews: 'Foro',
+            faq: 'Preguntas',
+            about: 'About', // # AÑADIDO: Traducción para la nueva sección
+            contact: 'Contacto',
+            latestPodcasts: 'Últimos Podcasts',
+            viewAll: 'Ver todos',
+            allPodcasts: 'Todos los Podcasts',
+            forum: 'Foro de Comunidad',
+            textInterviews: 'Entrevistas en Texto',
+            contactUs: 'Contáctanos',
+            habboName: 'Admin',
+            profileLink: 'Página',
+            socialNetworks: 'Redes Sociales',
+            whatsapp: 'WhatsApp',
+            facebook: 'Facebook',
+            instagram: 'Instagram',
+            twitter: 'Twitter',
+            frequentlyAsked: 'Dudas?',
+            sendUsMessage: 'Envíanos un mensaje',
+            theme: 'Tema',
+            dark: 'Oscuro',
+            light: 'Claro',
+            classic: 'Clásico',
+            language: 'Idioma',
+            spanish: 'Español',
+            english: 'Inglés',
+            colorTheme: 'Color',
+            welcome: 'Bienvenido a HayatoSound',
+            communityVoice: 'La voz de la música urbana',
+            joinUs: 'Contágiate con nuestro flow!',
+            noPodcasts: 'No hay podcasts disponibles en este momento',
+            noInterviews: 'No hay entrevistas disponibles en este momento',
+            footerText: '© 2025 AyatoSound Community. Todos los derechos reservados.',
+            playNow: 'Ver ahora',
+            close: 'Cerrar',
+            like: 'Me gusta',
+            comment: 'Comentar',
+            share: 'Compartir',
+            readMore: 'Leer más',
+            comments: 'Comentarios',
+            addComment: 'Añadir comentario...',
+            post: 'Publicar',
+            reply: 'Responder',
+            replies: 'respuestas',
+            viewReplies: 'Ver respuestas',
+            hideReplies: 'Ocultar respuestas',
+            loadMore: 'Cargar más',
+            category: 'Categoría',
+            by: 'por',
+            postedOn: 'Publicado el',
+            backToForum: 'Volver al foro',
+            previous: 'Anterior',
+            next: 'Siguiente',
+            habboUsername: 'Nombre de usuario',
+            enterUsername: 'Por favor, ingresa un nombre de usuario para comentar',
+            submit: 'Enviar',
+            cancel: 'Cancelar',
+            allForums: 'Todos los Foros',
+            back: 'Volver'
+        },
+        en: {
+            home: 'Home',
+            podcasts: 'Podcasts',
+            interviews: 'Forum',
+            faq: 'FAQ',
+            about: 'About', // # AÑADIDO: Traducción para la nueva sección
+            contact: 'Contact',
+            latestPodcasts: 'Latest Podcasts',
+            viewAll: 'View all',
+            allPodcasts: 'All Podcasts',
+            forum: 'Community Forum',
+            textInterviews: 'Text Interviews',
+            contactUs: 'Contact Us',
+            habboName: 'Habbo Name',
+            profileLink: 'Page',
+            socialNetworks: 'Social Networks',
+            whatsapp: 'WhatsApp',
+            facebook: 'Facebook',
+            instagram: 'Instagram',
+            twitter: 'Twitter',
+            frequentlyAsked: 'Frequently Asked Questions',
+            sendUsMessage: 'Send us a message',
+            theme: 'Theme',
+            dark: 'Dark',
+            light: 'Light',
+            classic: 'Classic',
+            language: 'Language',
+            spanish: 'Spanish',
+            english: 'English',
+            colorTheme: 'Color',
+            welcome: 'Welcome to the HayatoSound',
+            communityVoice: 'The voice of urban music',
+            joinUs: 'Get infected with our flow!',
+            noPodcasts: 'No podcasts available at the moment',
+            noInterviews: 'No interviews available at the moment',
+            footerText: '© 2025 AyatoSound Community. All rights reserved.',
+            playNow: 'Play now',
+            close: 'Close',
+            like: 'Like',
+            comment: 'Comment',
+            share: 'Share',
+            readMore: 'Read more',
+            comments: 'Comments',
+            addComment: 'Add comment...',
+            post: 'Post',
+            reply: 'Reply',
+            replies: 'replies',
+            viewReplies: 'View replies',
+            hideReplies: 'Hide replies',
+            loadMore: 'Load more',
+            category: 'Category',
+            by: 'by',
+            postedOn: 'Posted on',
+            backToForum: 'Back to forum',
+            previous: 'Previous',
+            next: 'Next',
+            habboUsername: 'Habbo Username',
+            enterUsername: 'Please enter your Habbo username to comment',
+            submit: 'Submit',
+            cancel: 'Cancel',
+            allForums: 'All Forums',
+            back: 'Back'
+        }
+    },
+    get t() {
+        return this.translations[this.language];
+    },
+    get colorThemes() {
+        return {
+            blue: { primary: '#06b6d4', primaryDark: '#0891b2', rgb: '6,182,209' },
+            purple: { primary: '#a855f7', primaryDark: '#9333ea', rgb: '168,85,247' },
+            red: { primary: '#ef4444', primaryDark: '#dc2626', rgb: '239,68,68' },
+            pink: { primary: '#ec4899', primaryDark: '#db2777', rgb: '236,72,153' },
+            green: { primary: '#10b981', primaryDark: '#059669', rgb: '16,185,129' },
+            yellow: { primary: '#eab308', primaryDark: '#ca8a04', rgb: '234,179,8' }
+        };
+    },
+    podcasts: [
+        {
+            id: 1,
+            title: 'Hace mucho no me disfrutaba tantoooo ❤️😍',
+            date: '2025-05-22',
+            description: 'El Trap nos gustaba pero no queríamos representar un mensaje tan fuerte.',
+            youtubeId: 'mUAyVi7lpy4',
+            thumbnail: 'https://i.ytimg.com/vi/mUAyVi7lpy4/maxresdefault.jpg'
+        },
+        {
+            id: 2,
+            title: 'Feid Juanpis: dos leyendas rompen récords!! 📀🎵',
+            date: '2025-02-09',
+            description: 'Después de tanto tiempo queriendo volver a hacer esta interview, se dio, mk. La nea más nea de este chochal es entrevistado por el host más host que hay. Yo, mk.',
+            youtubeId: 'kocuuUOpoac',
+            thumbnail: 'https://i.ytimg.com/vi/kocuuUOpoac/maxresdefault.jpg'
+        },
+        {
+            id: 3,
+            title: 'MikeBahiaOficial pierde un diente en The Juanpis Live Show 🤑🤯',
+            date: '2025-02-16',
+            description: 'Mk, ni a los más ancianos que he tenido en mi f*cking se les ha caído un diente. WTF?!! La pasé demasado weird, wuon. Pero este man la está rompiendo mal con su nuevo álbum.',
+            youtubeId: '2tf64lLbWoI',
+            thumbnail: 'https://i.ytimg.com/vi/2tf64lLbWoI/maxresdefault.jpg'
+        },
+        {
+            id: 4,
+            title: '¿Greeicy comía sancocho de Paloma?',
+            date: '2024-03-03',
+            description: 'Mis tropical chandix, sé que esperaban esta interview con tantas ganas como yo. Acá tienen a the ony and only: Greeicy. La pasamos del piuts hablando de su vida y de sus gustos gastronómicos extraños, pero lo mejor fue la bailada que nos pegamos (ya saben que lo mío es el tropipop, pero hice una excepción). ¿Quieren ver? Aquí tienen, chandas.',
+            youtubeId: 'XfAGOx_AJjI',
+            thumbnail: 'https://i.ytimg.com/vi/XfAGOx_AJjI/maxresdefault.jpg'
+        },
+        {
+            id: 5,
+            title: 'No Faltaba Nada, Pero Me Faltaba Todo',
+            date: '2025-01-29',
+            description: 'Esta semana llega a Los Hombres Sí Lloran un artista que conquistó al mundo con su música, pero cuya lucha más grande no se ha llevado a cabo en el escenario, sino en su interior: José Osorio Balvin, más conocido como J Balvin. ',
+            youtubeId: 'RDYv1Dpx_wc',
+            thumbnail: 'https://i.ytimg.com/vi/RDYv1Dpx_wc/maxresdefault.jpg'
+        },
+        {
+            id: 6,
+            title: 'THE ROCKSTAR SHOW By Nicky Jam 🤟🏽',
+            date: '2021-01-23',
+            description: 'Maluma habla sobre sus inicios, sus proyectos, sus mejores experiencias y sobre lo que viene para su carrera... ¿cuál fue tu parte favorita?',
+            youtubeId: 'pEjzwy1klHc',
+            thumbnail: 'https://i.ytimg.com/vi/pEjzwy1klHc/maxresdefault.jpg'
+        },
+        {
+            id: 7,
+            title: 'La primera entrevista de Karol G en Colombia en cuatro años',
+            date: '2024-04-28',
+            description: 'Mis chandas hermosas, el momento ha llegado: ya pueden ver y disfrutar esta mega entrevista con la bichota. ¡Ya saben que la pasamos del piuts y ahora ustedes también podrán hacerlo, weon! Con ustedes, la interview más top: Karol G en The Juanpis Live Show.',
+            youtubeId: 'A37rtzeVXWk',
+            thumbnail: 'https://i.ytimg.com/vi/A37rtzeVXWk/maxresdefault.jpg'
+        },
+        {
+            id: 8,
+            title: 'Sebastián Yatra y Vicky Martín Berrocal',
+            date: '2024-02-20',
+            description: 'Vicky Martín Berrocal estrena nueva temporada de ‘A solas con’ en Podium Podcast con las confidencias de Sebastián Yatra. Grabado en el Four Seasons Hotel Madrid, el cantante, actor y modelo colombiano habla a corazón abierto sobre su vida.',
+            youtubeId: 'HT8EtpSHLyU',
+            thumbnail: 'https://i.ytimg.com/vi/HT8EtpSHLyU/maxresdefault.jpg'
+        }
+    ],
+    forumPosts: [
+        {
+            id: 1,
+            title: '¿Cómo iniciar mi propio podcast?',
+            author: 'HayatoSound',
+            date: '2025-03-05',
+            likes: 17,
+            commentData: [], // # MODIFICACIÓN: Se añade array para comentarios dinámicos
+            content: '¡Hola, apasionados del audio! ¿Alguna vez has soñado con tener tu propio podcast?\n\n¡Este es el lugar para empezar! Si eres principiante o simplemente buscas mejorar, comparte tus ideas y dudas aquí. Podemos explorar juntos todo, desde el equipo básico que necesitas hasta las mejores estrategias para que tu podcast llegue a más personas.\n\nEn este tema podemos discutir:\n\n- Qué equipo necesitas (micrófono, audífonos, software)\n\n- Cómo grabar y editar tus primeros episodios\n\n- Dónde publicar tu podcast (Spotify, Apple Podcasts, etc.)\n\n- Estrategias para encontrar temas y promocionar tu show\n\n¿Qué desafíos has encontrado al intentar empezar? ¡Cuéntanos tu experiencia!',
+            images: [
+                'assets/Publicación1_image1.webp',
+                'assets/Publicación1_image2.webp'
+            ],
+            banner: 'assets/Publicación1_banner.webp',
+            liked: false,
+            userAvatar: 'assets/logo.png',
+            category: 'Informativo!'
+        },
+        {
+            id: 2,
+            title: 'Mejores Colaboraciones en la Música Urbana',
+            author: 'HayatoSound',
+            date: '2025-05-25',
+            likes: 42,
+            commentData: [],
+            content: '¡Qué onda, gente! La música urbana se define por sus -feats- explosivos. ¿Cuál es esa colaboración que te voló la cabeza? Ya sea un junte de reggaetón clásico o un remix de trap que rompió el internet, ¡es hora de debatir! Comparte tu favorita y el porqué de tu elección. ¿Es la vibra de los artistas? ¿La letra? ¿El beat?\n\nPodemos armar el top de los mejores -feats-, como:\n\n- -I Like It- de Cardi B, Bad Bunny & J Balvin\n\n- -La Canción- de J Balvin & Bad Bunny\n\n- -BICHOTA- de Karol G\n\n- -MAMIII- de Becky G & Karol G\n\n¿Cuál es esa colaboración que siempre pones en bucle?',
+            images: [
+                'assets/publicacion_2_colaboraciones_urbanas.webp',
+                'assets/publicacion_2_remix_musica.webp'
+            ],
+            banner: 'assets/colaboraciones_urbanas_banner.webp',
+            liked: true,
+            userAvatar: 'assets/logo.png',
+            category: 'Flow'
+        },
+        {
+            id: 3,
+            title: 'La influencia de la música urbana en la moda',
+            author: 'HayatoSound',
+            date: '2025-03-12',
+            likes: 31,
+            commentData: [],
+            content: '¡Pura vibra, familia! La música urbana no es solo un género; es una fuerza cultural que ha redefinido la moda a nivel global. Desde la adopción de prendas deportivas en el día a día hasta la popularización de marcas de lujo con toques de streetwear, la influencia es innegable. En este hilo, podemos analizar cómo artistas y movimientos específicos han moldeado las tendencias que vemos en las calles, en pasarelas y en las redes sociales. Compartamos ideas sobre el impacto de la cultura urbana en el vestir y el por qué detrás de estas tendencias.\n\nPodemos discutir temas clave como:\n\n- La evolución del streetwear y su integración en la alta costura\n\n- El simbolismo de los accesorios como cadenas, gorras y tenis\n\n- Cómo los videoclips se han convertido en catálogos de moda\n\n- El papel de artistas como Bad Bunny o Rosalía en la creación de nuevas tendencias\n\n¿Qué marca o estilo consideras que es el más influyente en la escena urbana actual?',
+            images: [
+                'assets/publicacion_2_colaboraciones_urbanas.webp',
+                'assets/publicacion_2_remix_musica.webp'
+            ],
+            banner: 'assets/musica_urbana_moda.webp',
+            liked: false,
+            userAvatar: 'assets/logo.png',
+            category: 'Bomba!'
+        },
+    ],
+    faqItems: [
+        {
+            question: '¿Cómo puedo participar en un podcast?',
+            answer: 'Puedes enviarnos un mensaje a través de WhatsApp o nuestro formulario de contacto. Estamos siempre buscando nuevas voces y perspectivas para nuestros programas.'
+        },
+        {
+            question: '¿Cada cuánto tiempo se publican nuevos podcasts?',
+            answer: 'Publicamos nuevos episodios cada semana, generalmente los viernes por la tarde. Mantente atento a nuestras redes sociales para no perderte ningún lanzamiento.'
+        },
+        {
+            question: '¿Puedo sugerir temas para futuros podcasts?',
+            answer: '¡Absolutamente! Valoramos mucho las sugerencias de nuestra comunidad. Envíanos tus ideas a través de cualquiera de nuestros canales de contacto.'
+        },
+        {
+            question: '¿Cómo puedo ver los podcasts anteriores?',
+            answer: 'Todos nuestros podcasts están archivados en la sección \'Todos los Podcasts\'. Puedes buscar por fecha, tema o participante para encontrar el episodio que buscas.'
+        }
+    ],
+    getCurrentPosts() {
+        // # MODIFICACIÓN: Se muestran 4 posts en lugar de 5 para un inicio más limpio.
+        return this.forumPosts.slice(0, 4);
+    },
+    getAllPosts() {
+        return this.forumPosts;
+    },
+    toggleLike(postId) {
+        const post = this.forumPosts.find(p => p.id === postId);
+        if (post) {
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+        }
+    },
+    showCommentModal(target) {
+        this.commentTarget = target;
+        const post = this.selectedPodcast.isPost ? this.forumPosts.find(p => p.id === this.commentTarget.id) : null;
+        if (post) {
+             const commentInput = document.getElementById(`comment-post-${post.id}`);
+             if (commentInput && !commentInput.value.trim()) {
+                 // Opcional: alertar al usuario que el comentario no puede estar vacío
+                 return;
+             }
+        }
+        this.showUsernameModal = true;
+    },
+    // # MODIFICACIÓN: Lógica para Comentarios (no persistente)
+    // Esta función ahora añade el comentario al array 'commentData' del post correspondiente.
+    // El comentario solo será visible en la sesión actual y se perderá al recargar.
+    addComment(event) {
+        event.preventDefault();
+        if (!this.commentUsername.trim()) return;
+
+        const post = this.forumPosts.find(p => p.id === this.commentTarget.id);
+        if (!post) return;
+        
+        const commentInput = document.getElementById(`comment-post-${post.id}`);
+        const commentText = commentInput.value;
+
+        if (!commentText.trim()) {
+            this.showUsernameModal = false;
+            return;
+        }
+
+        // Añade el nuevo comentario al array
+        post.commentData.unshift({ // usamos unshift para que aparezca al principio
+            user: this.commentUsername,
+            text: commentText,
+            date: new Date(),
+            replies: []
+        });
+        
+        commentInput.value = ''; // Limpia el textarea
+        this.showUsernameModal = false; // Cierra el modal de nombre de usuario
+    },
+    toggleReplies(postId, commentId) {
+        const key = `${postId}-${commentId}`;
+        this.activeComment[key] = !this.activeComment[key];
+    },
+    scrollToSection(ref) {
+        document.querySelector(ref).scrollIntoView({ behavior: 'smooth' });
+        this.menuOpen = false;
+    },
+    scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-gray-900/95 backdrop-blur-md border-b border-gray-700 shadow-lg" :class="{
+        'bg-gray-900/95 border-gray-700': theme === 'dark',
+        'bg-amber-100/95 border-amber-300': theme === 'classic',
+        'bg-white/95 border-gray-200': theme === 'light'
+    }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <img src="assets/logo.png" alt="Habbo Podcast Logo" class="h-10 w-auto mr-3 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/40x40/06b6d4/ffffff?text=HP';">
+                    <div class="font-bold text-2xl md:text-3xl text-cyan-400 text-shadow-lg animate-pulse" :class="{
+                        'text-cyan-400': color === 'blue',
+                        'text-purple-400': color === 'purple',
+                        'text-red-400': color === 'red',
+                        'text-pink-400': color === 'pink',
+                        'text-green-400': color === 'green',
+                        'text-yellow-400': color === 'yellow'
+                    }">
+                        Hayato<span class="text-white">Sound</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-6">
+                        <template x-for="item in [
+                            { name: t.home, ref: '#home', id: 'home' },
+                            { name: t.podcasts, ref: '#podcasts', id: 'podcasts' },
+                            { name: t.interviews, ref: '#interviews', id: 'interviews' },
+                            { name: t.faq, ref: '#faq', id: 'faq' },
+                            { name: t.about, ref: '#about', id: 'about' },
+                            { name: t.contact, ref: '#contact', id: 'contact' }
+                        ]" :key="item.id">
+                            <button
+                                @click="scrollToSection(item.ref)"
+                                class="px-4 py-2 rounded-md text-sm md:text-base font-medium transition-all duration-300 hover:scale-105 transform"
+                                :class="{
+                                    'text-cyan-400 text-shadow-md': activeSection === item.id && color === 'blue',
+                                    'text-purple-400 text-shadow-md': activeSection === item.id && color === 'purple',
+                                    'text-red-400 text-shadow-md': activeSection === item.id && color === 'red',
+                                    'text-pink-400 text-shadow-md': activeSection === item.id && color === 'pink',
+                                    'text-green-400 text-shadow-md': activeSection === item.id && color === 'green',
+                                    'text-yellow-400 text-shadow-md': activeSection === item.id && color === 'yellow',
+                                    'text-gray-300 hover:text-white': theme === 'dark' && activeSection !== item.id,
+                                    'text-amber-800 hover:text-amber-600': theme === 'classic' && activeSection !== item.id,
+                                    'text-gray-700 hover:text-gray-900': theme === 'light' && activeSection !== item.id
+                                }"
+                                x-text="item.name"
+                            ></button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Right side controls -->
+                <div class="flex items-center space-x-3">
+                    <!-- Color selector dropdown -->
+                    <div class="relative group">
+                        <button
+                            @click="colorDropdown = !colorDropdown"
+                            class="w-10 h-10 rounded-full transition-transform duration-200 hover:scale-110 focus:outline-none flex items-center justify-center shadow-lg"
+                            :class="{
+                                'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                                'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                                'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                                'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                                'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                                'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                            }"
+                        >
+                            <div class="w-6 h-6 rounded-full bg-black bg-opacity-30 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                    <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                                </svg>
+                            </div>
+                        </button>
+                        <div 
+                            x-show="colorDropdown" 
+                            @click.away="colorDropdown = false"
+                            class="absolute right-0 mt-2 w-48 rounded-xl shadow-2xl bg-gray-800 ring-1 overflow-hidden"
+                            :class="{
+                                'ring-cyan-400': color === 'blue',
+                                'ring-purple-400': color === 'purple',
+                                'ring-red-400': color === 'red',
+                                'ring-pink-400': color === 'pink',
+                                'ring-green-400': color === 'green',
+                                'ring-yellow-400': color === 'yellow'
+                            }"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                        >
+                            <div class="p-3 border-b border-gray-700">
+                                <h4 class="font-semibold text-cyan-400" :class="{
+                                    'text-cyan-400': color === 'blue',
+                                    'text-purple-400': color === 'purple',
+                                    'text-red-400': color === 'red',
+                                    'text-pink-400': color === 'pink',
+                                    'text-green-400': color === 'green',
+                                    'text-yellow-400': color === 'yellow'
+                                }" x-text="t.colorTheme"></h4>
+                            </div>
+                            <div class="p-2">
+                                <template x-for="c in ['blue', 'purple', 'red', 'pink', 'green', 'yellow']" :key="c">
+                                    <button
+                                        @click="color = c; colorDropdown = false"
+                                        class="flex items-center w-full p-3 rounded-lg transition-all duration-200 mb-1"
+                                        :class="{
+                                            'bg-gradient-to-r from-cyan-400 to-blue-600 text-white': color === 'blue' && c === 'blue',
+                                            'bg-gradient-to-r from-purple-400 to-pink-600 text-white': color === 'purple' && c === 'purple',
+                                            'bg-gradient-to-r from-red-400 to-orange-600 text-white': color === 'red' && c === 'red',
+                                            'bg-gradient-to-r from-pink-400 to-rose-600 text-white': color === 'pink' && c === 'pink',
+                                            'bg-gradient-to-r from-green-400 to-emerald-600 text-white': color === 'green' && c === 'green',
+                                            'bg-gradient-to-r from-yellow-400 to-amber-600 text-white': color === 'yellow' && c === 'yellow',
+                                            'hover:bg-gray-700 text-gray-300': theme === 'dark' && color !== c,
+                                            'hover:bg-amber-200 text-amber-800': theme === 'classic' && color !== c,
+                                            'hover:bg-gray-100 text-gray-700': theme === 'light' && color !== c
+                                        }"
+                                    >
+                                        <div 
+                                            class="w-8 h-8 rounded-full mr-3 flex items-center justify-center"
+                                            :class="{
+                                                'bg-gradient-to-r from-cyan-400 to-blue-600': c === 'blue',
+                                                'bg-gradient-to-r from-purple-400 to-pink-600': c === 'purple',
+                                                'bg-gradient-to-r from-red-400 to-orange-600': c === 'red',
+                                                'bg-gradient-to-r from-pink-400 to-rose-600': c === 'pink',
+                                                'bg-gradient-to-r from-green-400 to-emerald-600': c === 'green',
+                                                'bg-gradient-to-r from-yellow-400 to-amber-600': c === 'yellow'
+                                            }"
+                                        >
+                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" x-show="color === c">
+                                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="capitalize font-medium" x-text="c"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Language selector -->
+                    <button
+                        @click="language = language === 'es' ? 'en' : 'es'"
+                        class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+                        :class="{
+                            'bg-gray-700 hover:bg-gray-600 text-white': theme === 'dark',
+                            'bg-amber-200 hover:bg-amber-300 text-amber-800': theme === 'classic',
+                            'bg-gray-200 hover:bg-gray-300 text-gray-800': theme === 'light'
+                        }"
+                        x-text="language === 'es' ? 'EN' : 'ES'"
+                    ></button>
+
+                    <!-- Theme selector dropdown -->
+                    <div class="relative group">
+                        <button
+                            @click="themeDropdown = !themeDropdown"
+                            class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center space-x-2"
+                            :class="{
+                                'bg-gray-700 hover:bg-gray-600 text-white': theme === 'dark',
+                                'bg-amber-200 hover:bg-amber-300 text-amber-800': theme === 'classic',
+                                'bg-gray-200 hover:bg-gray-300 text-gray-800': theme === 'light'
+                            }"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                            <span x-text="t.theme"></span>
+                        </button>
+                        <div 
+                            x-show="themeDropdown" 
+                            @click.away="themeDropdown = false"
+                            class="absolute right-0 mt-2 w-48 rounded-xl shadow-2xl bg-gray-800 ring-1 overflow-hidden"
+                            :class="{
+                                'bg-gray-800 ring-gray-700': theme === 'dark',
+                                'bg-amber-100 ring-amber-300': theme === 'classic',
+                                'bg-white ring-gray-200': theme === 'light'
+                            }"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                        >
+                            <div class="p-3 border-b border-gray-700">
+                                <h4 class="font-semibold text-cyan-400" :class="{
+                                    'text-cyan-400': color === 'blue',
+                                    'text-purple-400': color === 'purple',
+                                    'text-red-400': color === 'red',
+                                    'text-pink-400': color === 'pink',
+                                    'text-green-400': color === 'green',
+                                    'text-yellow-400': color === 'yellow'
+                                }" x-text="t.theme"></h4>
+                            </div>
+                            <div class="p-2">
+                                <!-- # MODIFICACIÓN: Texto en Selector de Tema -->
+                                <template x-for="themeName in ['dark', 'light', 'classic']" :key="themeName">
+                                    <button
+                                        @click="theme = themeName; themeDropdown = false"
+                                        class="flex items-center w-full p-3 rounded-lg transition-all duration-200 mb-1"
+                                        :class="{
+                                            'bg-gradient-to-r from-cyan-400 to-blue-600 text-white': theme === 'dark' && themeName === 'dark' && color === 'blue',
+                                            'bg-gradient-to-r from-purple-400 to-pink-600 text-white': theme === 'dark' && themeName === 'dark' && color === 'purple',
+                                            'bg-gradient-to-r from-red-400 to-orange-600 text-white': theme === 'dark' && themeName === 'dark' && color === 'red',
+                                            'bg-gradient-to-r from-pink-400 to-rose-600 text-white': theme === 'dark' && themeName === 'dark' && color === 'pink',
+                                            'bg-gradient-to-r from-green-400 to-emerald-600 text-white': theme === 'dark' && themeName === 'dark' && color === 'green',
+                                            'bg-gradient-to-r from-yellow-400 to-amber-600 text-white': theme === 'dark' && themeName === 'dark' && color === 'yellow',
+                                            'bg-amber-200 text-amber-800': theme === 'classic' && themeName === 'classic',
+                                            'bg-gray-200 text-gray-700': theme === 'light' && themeName === 'light',
+                                            'hover:bg-gray-700 text-gray-300': theme === 'dark' && themeName !== 'dark',
+                                            'hover:bg-amber-200 text-amber-800': theme === 'classic' && themeName !== 'classic',
+                                            'hover:bg-gray-100 text-gray-700': theme === 'light' && themeName !== 'light'
+                                        }"
+                                    >
+                                        <div class="w-8 h-8 rounded-full mr-3 flex items-center justify-center" :class="{
+                                            'bg-gray-800': themeName === 'dark',
+                                            'bg-white border border-gray-300': themeName === 'light',
+                                            'bg-amber-100 border border-amber-300': themeName === 'classic'
+                                        }">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" x-show="themeName === 'dark'">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                                            </svg>
+                                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24" x-show="themeName === 'light'">
+                                                <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+                                            </svg>
+                                            <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 24 24" x-show="themeName === 'classic'">
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                            </svg>
+                                        </div>
+                                        <span class="capitalize font-medium" x-text="translations[language][themeName]"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <button
+                        @click="menuOpen = !menuOpen"
+                        class="md:hidden p-2 rounded-md"
+                    >
+                        <div class="w-6 h-6 flex flex-col justify-center items-center text-white">
+                            <span class="block h-0.5 w-6 mb-1 bg-current transition-all" :class="menuOpen ? 'rotate-45 translate-y-1.5' : ''"></span>
+                            <span class="block h-0.5 w-6 mb-1 bg-current transition-all" :class="menuOpen ? 'opacity-0' : ''"></span>
+                            <span class="block h-0.5 w-6 bg-current transition-all" :class="menuOpen ? '-rotate-45 -translate-y-1.5' : ''"></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div x-show="menuOpen" class="md:hidden bg-gray-800 border-t border-gray-700 shadow-lg" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform -translate-y-2">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <template x-for="item in [
+                    { name: t.home, ref: '#home' },
+                    { name: t.podcasts, ref: '#podcasts' },
+                    { name: t.interviews, ref: '#interviews' },
+                    { name: t.faq, ref: '#faq' },
+                    { name: t.about, ref: '#about' },
+                    { name: t.contact, ref: '#contact' }
+                ]" :key="item.name">
+                    <button
+                        @click="scrollToSection(item.ref); menuOpen = false"
+                        class="block px-4 py-3 rounded-md text-base font-medium w-full text-left transition-colors"
+                        :class="{
+                            'text-cyan-400 text-shadow-md': activeSection === item.name.toLowerCase() && color === 'blue',
+                            'text-purple-400 text-shadow-md': activeSection === item.name.toLowerCase() && color === 'purple',
+                            'text-red-400 text-shadow-md': activeSection === item.name.toLowerCase() && color === 'red',
+                            'text-pink-400 text-shadow-md': activeSection === item.name.toLowerCase() && color === 'pink',
+                            'text-green-400 text-shadow-md': activeSection === item.name.toLowerCase() && color === 'green',
+                            'text-yellow-400 text-shadow-md': activeSection === item.name.toLowerCase() && color === 'yellow',
+                            'text-gray-300 hover:bg-gray-700': theme === 'dark' && activeSection !== item.name.toLowerCase(),
+                            'text-amber-800 hover:bg-amber-200': theme === 'classic' && activeSection !== item.name.toLowerCase(),
+                            'text-gray-700 hover:bg-gray-100': theme === 'light' && activeSection !== item.name.toLowerCase()
+                        }"
+                        x-text="item.name"
+                    ></button>
+                </template>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 text-cyan-400 text-shadow-lg animate-pulse" :class="{
+                    'text-cyan-400': color === 'blue',
+                    'text-purple-400': color === 'purple',
+                    'text-red-400': color === 'red',
+                    'text-pink-400': color === 'pink',
+                    'text-green-400': color === 'green',
+                    'text-yellow-400': color === 'yellow'
+                }" x-text="t.welcome"></h1>
+                <p class="text-2xl md:text-3xl mb-8 text-gray-300" x-text="t.communityVoice"></p>
+                <button
+                    @click="scrollToSection('#podcasts')"
+                    class="inline-block px-10 py-4 rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-bold text-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl transform"
+                    :class="{
+                        'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                        'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                        'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                        'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                        'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                        'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                    }"
+                    x-text="t.joinUs"
+                ></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Podcasts -->
+    <section id="podcasts" class="py-16 px-4 sm:px-6 lg:px-8" :class="{
+        'bg-gradient-to-b from-gray-900 to-gray-800': theme === 'dark',
+        'bg-gradient-to-b from-amber-50 to-amber-100': theme === 'classic',
+        'bg-gradient-to-b from-white to-gray-100': theme === 'light'
+    }">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center text-cyan-400 text-shadow-lg" :class="{
+                'text-cyan-400': color === 'blue',
+                'text-purple-400': color === 'purple',
+                'text-red-400': color === 'red',
+                'text-pink-400': color === 'pink',
+                'text-green-400': color === 'green',
+                'text-yellow-400': color === 'yellow'
+            }" x-text="t.latestPodcasts"></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <template x-for="podcast in podcasts.slice(0, 3)" :key="podcast.id">
+                    <div class="bg-gray-800 rounded-2xl overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl transform card-hover" :class="{
+                        'border-4 border-cyan-400': color === 'blue',
+                        'border-4 border-purple-400': color === 'purple',
+                        'border-4 border-red-400': color === 'red',
+                        'border-4 border-pink-400': color === 'pink',
+                        'border-4 border-green-400': color === 'green',
+                        'border-4 border-yellow-400': color === 'yellow',
+                        'bg-gray-800': theme === 'dark',
+                        'bg-amber-100': theme === 'classic',
+                        'bg-white': theme === 'light'
+                    }">
+                        <div class="relative group">
+                            <img
+                                :src="podcast.thumbnail"
+                                :alt="podcast.title"
+                                class="w-full h-60 object-cover"
+                                onerror="this.onerror=null;this.src='https://placehold.co/640x360/1f2937/6b7280?text=Miniatura+no+disponible';"
+                            />
+                            <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button 
+                                    @click="selectedPodcast = podcast"
+                                    class="bg-red-600 hover:bg-red-700 text-white p-4 rounded-full transition-colors transform hover:scale-110 shadow-lg"
+                                >
+                                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+                                <span x-text="podcast.date"></span>
+                            </div>
+                        </div>
+                        <div class="p-6" :class="{
+                            'bg-gray-800': theme === 'dark',
+                            'bg-amber-100': theme === 'classic',
+                            'bg-white': theme === 'light'
+                        }">
+                            <h3 class="text-2xl font-bold mb-3" x-text="podcast.title"></h3>
+                            <p class="text-gray-300 line-clamp-2" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }" x-text="podcast.description"></p>
+                            <button
+                                @click="selectedPodcast = podcast"
+                                class="mt-6 w-full flex items-center justify-center space-x-2 px-4 py-2 rounded bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-semibold transition-all duration-300 hover:opacity-90 hover:scale-105"
+                                :class="{
+                                    'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                                    'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                                    'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                                    'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                                    'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                                    'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                                }"
+                                x-text="t.playNow"
+                            ></button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="text-center mt-16">
+                <!-- # MODIFICACIÓN: Este botón ahora abre el modal de 'Todos los Podcasts' -->
+                <button
+                    @click="showAllPodcasts = true"
+                    class="inline-block px-8 py-4 rounded-2xl bg-gray-800 border-2 border-cyan-400 transition-all duration-300 hover:scale-105 transform text-lg font-semibold"
+                    :class="{
+                        'border-cyan-400': color === 'blue',
+                        'border-purple-400': color === 'purple',
+                        'border-red-400': color === 'red',
+                        'border-pink-400': color === 'pink',
+                        'border-green-400': color === 'green',
+                        'border-yellow-400': color === 'yellow',
+                        'bg-gray-800': theme === 'dark',
+                        'bg-amber-100': theme === 'classic',
+                        'bg-white': theme === 'light'
+                    }"
+                    x-text="t.viewAll"
+                ></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Forum Posts - Home Page -->
+    <section id="interviews" class="py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center text-cyan-400 text-shadow-lg" :class="{
+                'text-cyan-400': color === 'blue',
+                'text-purple-400': color === 'purple',
+                'text-red-400': color === 'red',
+                'text-pink-400': color === 'pink',
+                'text-green-400': color === 'green',
+                'text-yellow-400': color === 'yellow'
+            }" x-text="t.forum"></h2>
+            
+            <div class="space-y-10">
+                <template x-for="post in getCurrentPosts()" :key="post.id">
+                    <div class="bg-gray-800 rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl transform card-hover" :class="{
+                        'bg-gray-800': theme === 'dark',
+                        'bg-amber-100': theme === 'classic',
+                        'bg-white': theme === 'light'
+                    }">
+                        <img
+                            :src="post.banner"
+                            :alt="post.title"
+                            class="w-full h-80 object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/800x400/1f2937/6b7280?text=Imagen+no+disponible';"
+                        />
+                        <div class="p-8" :class="{
+                            'bg-gray-800': theme === 'dark',
+                            'bg-amber-100': theme === 'classic',
+                            'bg-white': theme === 'light'
+                        }">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                                <h3 class="text-3xl font-bold" x-text="post.title"></h3>
+                                <div class="text-sm mt-2 sm:mt-0" :class="{
+                                    'text-gray-400': theme === 'dark',
+                                    'text-amber-600': theme === 'classic',
+                                    'text-gray-500': theme === 'light'
+                                }">
+                                    <span x-text="post.date"></span> • Por <span x-text="post.author"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center mb-6">
+                                <img :src="post.userAvatar" :alt="post.author" class="w-12 h-12 rounded-full mr-4" onerror="this.onerror=null;this.src='https://placehold.co/48x48/1f2937/6b7280?text=U';"/>
+                                <div>
+                                    <p class="font-semibold" x-text="post.author"></p>
+                                    <p class="text-sm" :class="{
+                                        'text-gray-400': theme === 'dark',
+                                        'text-amber-600': theme === 'classic',
+                                        'text-gray-500': theme === 'light'
+                                    }">Miembro desde 2020</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-300 text-lg mb-8 leading-relaxed line-clamp-3" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }" x-text="post.content"></p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <template x-for="img in post.images.slice(0, 2)" :key="img">
+                                    <div class="rounded-xl overflow-hidden shadow-lg">
+                                        <img
+                                            :src="img"
+                                            :alt="`Post image`"
+                                            class="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
+                                            onerror="this.onerror=null;this.src='https://placehold.co/400x300/1f2937/6b7280?text=Imagen+no+disponible';"
+                                        />
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                <div class="flex items-center space-x-8 mb-4 sm:mb-0">
+                                    <button
+                                        @click="toggleLike(post.id)"
+                                        class="flex items-center space-x-3"
+                                        :class="{
+                                            'text-cyan-400': post.liked && color === 'blue',
+                                            'text-purple-400': post.liked && color === 'purple',
+                                            'text-red-400': post.liked && color === 'red',
+                                            'text-pink-400': post.liked && color === 'pink',
+                                            'text-green-400': post.liked && color === 'green',
+                                            'text-yellow-400': post.liked && color === 'yellow',
+                                            'text-gray-400 hover:text-white': !post.liked
+                                        }"
+                                    >
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="{
+                                            'bg-cyan-500': post.liked && color === 'blue',
+                                            'bg-purple-500': post.liked && color === 'purple',
+                                            'bg-red-500': post.liked && color === 'red',
+                                            'bg-pink-500': post.liked && color === 'pink',
+                                            'bg-green-500': post.liked && color === 'green',
+                                            'bg-yellow-500': post.liked && color === 'yellow',
+                                            'bg-gray-700': !post.liked
+                                        }">
+                                            <svg class="w-5 h-5" :fill="post.liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                        </div>
+                                        <span class="font-semibold" x-text="`${post.likes} ${t.like}`"></span>
+                                    </button>
+                                    
+                                    <div class="flex items-center space-x-3 text-gray-400">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="{
+                                            'bg-gray-700': theme === 'dark',
+                                            'bg-amber-200': theme === 'classic',
+                                            'bg-gray-200': theme === 'light'
+                                        }">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                            </svg>
+                                        </div>
+                                        <!-- # MODIFICACIÓN: Contador de comentarios ahora es dinámico -->
+                                        <span class="font-semibold" x-text="`${post.commentData.length} ${t.comments}`"></span>
+                                    </div>
+                                    
+                                    <button class="flex items-center space-x-3 text-gray-400 hover:text-white transition-colors">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="{
+                                            'bg-gray-700': theme === 'dark',
+                                            'bg-amber-200': theme === 'classic',
+                                            'bg-gray-200': theme === 'light'
+                                        }">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684 3 3 0 00-5.367-2.684 3 3 0 005.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                            </svg>
+                                        </div>
+                                        <span class="font-semibold" x-text="t.share"></span>
+                                    </button>
+                                </div>
+                                
+                                <button
+                                    @click="selectedPodcast = { ...post, isPost: true }"
+                                    class="text-lg font-semibold text-cyan-400 hover:underline transition-colors"
+                                    :class="{
+                                        'text-cyan-400': color === 'blue',
+                                        'text-purple-400': color === 'purple',
+                                        'text-red-400': color === 'red',
+                                        'text-pink-400': color === 'pink',
+                                        'text-green-400': color === 'green',
+                                        'text-yellow-400': color === 'yellow'
+                                    }"
+                                    x-text="t.readMore"
+                                ></button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button
+                    @click="selectedPodcast = { isAllForums: true }"
+                    class="px-8 py-4 text-lg bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-semibold rounded"
+                    :class="{
+                        'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                        'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                        'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                        'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                        'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                        'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                    }"
+                    x-text="t.allForums"
+                ></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- All Forums Page -->
+    <div x-show="selectedPodcast?.isAllForums" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" @click="selectedPodcast = null">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div 
+                class="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full max-h-screen overflow-y-auto"
+                :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white': theme === 'light'
+                }"
+                @click.outside="selectedPodcast = null"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+                <div class="absolute top-4 left-4 z-10">
+                    <button
+                        @click="selectedPodcast = null"
+                        class="text-gray-400 hover:text-white transition-colors bg-black bg-opacity-30 p-2 rounded-full"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="absolute top-4 right-4 z-10">
+                    <button
+                        @click="selectedPodcast = null"
+                        class="text-gray-400 hover:text-white transition-colors bg-black bg-opacity-30 p-2 rounded-full"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="p-8">
+                    <h1 class="text-4xl font-bold mb-8 text-cyan-400 text-shadow-lg" :class="{
+                        'text-cyan-400': color === 'blue',
+                        'text-purple-400': color === 'purple',
+                        'text-red-400': color === 'red',
+                        'text-pink-400': color === 'pink',
+                        'text-green-400': color === 'green',
+                        'text-yellow-400': color === 'yellow'
+                    }" x-text="t.allForums"></h1>
+                    
+                    <div class="space-y-8">
+                        <template x-for="post in getAllPosts()" :key="post.id">
+                            <div 
+                                class="rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl transform cursor-pointer card-hover"
+                                :class="{
+                                    'border-4 border-cyan-400': color === 'blue',
+                                    'border-4 border-purple-400': color === 'purple',
+                                    'border-4 border-red-400': color === 'red',
+                                    'border-4 border-pink-400': color === 'pink',
+                                    'border-4 border-green-400': color === 'green',
+                                    'border-4 border-yellow-400': color === 'yellow',
+                                    'bg-gray-800': theme === 'dark',
+                                    'bg-amber-100': theme === 'classic',
+                                    'bg-white': theme === 'light'
+                                }"
+                                @click="selectedPodcast = { ...post, isPost: true }"
+                            >
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="md:col-span-1">
+                                        <img
+                                            :src="post.banner"
+                                            :alt="post.title"
+                                            class="w-full h-48 object-cover rounded-xl"
+                                            onerror="this.onerror=null;this.src='https://placehold.co/400x200/1f2937/6b7280?text=Banner+no+disponible';"
+                                        />
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <div class="p-6 h-full flex flex-col" :class="{
+                                            'bg-gray-800': theme === 'dark',
+                                            'bg-amber-100': theme === 'classic',
+                                            'bg-white': theme === 'light'
+                                        }">
+                                            <div class="flex items-center mb-4">
+                                                <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-cyan-400 to-blue-600 text-white" :class="{
+                                                    'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                                                    'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                                                    'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                                                    'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                                                    'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                                                    'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                                                }" x-text="post.category"></span>
+                                                <div class="ml-4 flex items-center">
+                                                    <img :src="post.userAvatar" :alt="post.author" class="w-8 h-8 rounded-full mr-2" onerror="this.onerror=null;this.src='https://placehold.co/32x32/1f2937/6b7280?text=U';"/>
+                                                    <span class="text-sm" x-text="post.author"></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <h3 class="text-2xl font-bold mb-3" x-text="post.title"></h3>
+                                            
+                                            <p class="mb-4 line-clamp-2" :class="{
+                                                'text-gray-300': theme === 'dark',
+                                                'text-amber-800': theme === 'classic',
+                                                'text-gray-700': theme === 'light'
+                                            }" x-text="post.content"></p>
+                                            
+                                            <div class="mt-auto flex items-center justify-between">
+                                                <span class="text-sm" :class="{
+                                                    'text-gray-400': theme === 'dark',
+                                                    'text-amber-600': theme === 'classic',
+                                                    'text-gray-500': theme === 'light'
+                                                }" x-text="post.date"></span>
+                                                
+                                                <div class="flex items-center space-x-4">
+                                                    <div class="flex items-center space-x-2" :class="{
+                                                        'text-cyan-400': post.liked && color === 'blue',
+                                                        'text-purple-400': post.liked && color === 'purple',
+                                                        'text-red-400': post.liked && color === 'red',
+                                                        'text-pink-400': post.liked && color === 'pink',
+                                                        'text-green-400': post.liked && color === 'green',
+                                                        'text-yellow-400': post.liked && color === 'yellow',
+                                                        'text-gray-400': !post.liked
+                                                    }">
+                                                        <svg class="w-5 h-5" :fill="post.liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                        <span x-text="post.likes"></span>
+                                                    </div>
+                                                    
+                                                    <div class="flex items-center space-x-2" :class="{
+                                                        'text-gray-400': theme === 'dark',
+                                                        'text-amber-600': theme === 'classic',
+                                                        'text-gray-500': theme === 'light'
+                                                    }">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                                        </svg>
+                                                        <span x-text="post.commentData.length"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-16 px-4 sm:px-6 lg:px-8" :class="{
+        'bg-gray-800/50': theme === 'dark',
+        'bg-amber-50/50': theme === 'classic',
+        'bg-gray-100/50': theme === 'light'
+    }">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center text-cyan-400 text-shadow-lg" :class="{
+                'text-cyan-400': color === 'blue',
+                'text-purple-400': color === 'purple',
+                'text-red-400': color === 'red',
+                'text-pink-400': color === 'pink',
+                'text-green-400': color === 'green',
+                'text-yellow-400': color === 'yellow'
+            }" x-text="t.frequentlyAsked"></h2>
+            
+            <div class="space-y-6">
+                <template x-for="(item, index) in faqItems" :key="index">
+                    <div class="rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl card-hover" :class="{
+                        'bg-gray-800': theme === 'dark',
+                        'bg-amber-100': theme === 'classic',
+                        'bg-white': theme === 'light'
+                    }">
+                        <div class="p-8">
+                            <h3 class="text-2xl font-bold mb-4" x-text="item.question"></h3>
+                            <p class="text-lg leading-relaxed" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }" x-text="item.answer"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <!-- # MODIFICACIÓN: NUEVA SECCIÓN 'ABOUT' (MISIÓN Y VISIÓN) -->
+    <section id="about" class="py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center text-cyan-400 text-shadow-lg" :class="{
+                'text-cyan-400': color === 'blue',
+                'text-purple-400': color === 'purple',
+                'text-red-400': color === 'red',
+                'text-pink-400': color === 'pink',
+                'text-green-400': color === 'green',
+                'text-yellow-400': color === 'yellow'
+            }">About</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Misión -->
+                <div class="rounded-2xl p-8 card-hover" :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white shadow-lg': theme === 'light'
+                }">
+                    <h3 class="text-3xl font-bold mb-6 text-center" :class="{
+                        'text-cyan-400': color === 'blue', 'text-purple-400': color === 'purple', 'text-red-400': color === 'red',
+                        'text-pink-400': color === 'pink', 'text-green-400': color === 'green', 'text-yellow-400': color === 'yellow'
+                    }">Misión</h3>
+                    <p class="text-lg leading-relaxed text-center" :class="{
+                        'text-gray-300': theme === 'dark',
+                        'text-amber-800': theme === 'classic',
+                        'text-gray-700': theme === 'light'
+                    }">
+                        Nuestra misión es crear un puente entre artistas y público a través de entrevistas auténticas, sesiones en vivo e interacciones digitales, generando un espacio donde la música urbana se exprese con libertad, verdad y cercanía. Queremos que cada artista tenga la oportunidad de ser escuchado más allá de los escenarios.
+                    </p>
+                </div>
+
+                <!-- Visión -->
+                <div class="rounded-2xl p-8 card-hover" :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white shadow-lg': theme === 'light'
+                }">
+                    <h3 class="text-3xl font-bold mb-6 text-center" :class="{
+                        'text-cyan-400': color === 'blue', 'text-purple-400': color === 'purple', 'text-red-400': color === 'red',
+                        'text-pink-400': color === 'pink', 'text-green-400': color === 'green', 'text-yellow-400': color === 'yellow'
+                    }">Visión</h3>
+                    <p class="text-lg leading-relaxed text-center" :class="{
+                        'text-gray-300': theme === 'dark',
+                        'text-amber-800': theme === 'classic',
+                        'text-gray-700': theme === 'light'
+                    }">
+                        Nuestra visión es consolidar a HayatoSound como una plataforma cultural líder en Latinoamérica, reconocida por impulsar el talento urbano y conectar a las nuevas generaciones con sus artistas favoritos mediante experiencias innovadoras, interactivas y memorables.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-16 px-4 sm:px-6 lg:px-8" :class="{
+        'bg-gradient-to-b from-gray-800 to-gray-900': theme === 'dark',
+        'bg-gradient-to-b from-amber-100 to-amber-200': theme === 'classic',
+        'bg-gradient-to-b from-gray-100 to-white': theme === 'light'
+    }">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-center text-cyan-400 text-shadow-lg" :class="{
+                'text-cyan-400': color === 'blue',
+                'text-purple-400': color === 'purple',
+                'text-red-400': color === 'red',
+                'text-pink-400': color === 'pink',
+                'text-green-400': color === 'green',
+                'text-yellow-400': color === 'yellow'
+            }" x-text="t.contactUs"></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="rounded-2xl p-8" :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white': theme === 'light'
+                }">
+                    <h3 class="text-2xl font-bold mb-8" x-text="Admin"></h3>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }" x-text="t.habboName"></label>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg mr-4" :class="{
+                                    'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                                    'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                                    'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                                    'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                                    'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                                    'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                                }">
+                                    HF
+                                </div>
+                                <p class="text-xl font-semibold">AyatoSound</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }" x-text="t.profileLink"></label>
+                            <a 
+                                href="https://www.AyatoSound.com.co"
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                class="text-cyan-400 hover:underline text-lg"
+                                :class="{
+                                    'text-cyan-400': color === 'blue',
+                                    'text-purple-400': color === 'purple',
+                                    'text-red-400': color === 'red',
+                                    'text-pink-400': color === 'pink',
+                                    'text-green-400': color === 'green',
+                                    'text-yellow-400': color === 'yellow'
+                                }"
+                            >
+                                www.AyatoSound.com.co
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold mt-10 mb-6" x-text="t.socialNetworks"></h3>
+                    <div class="space-y-4">
+                        <a
+                            href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:shadow-lg transform hover:translate-y-[-2px] card-hover" :class="{ 'bg-gray-700': theme === 'dark', 'bg-amber-50': theme === 'classic', 'bg-gray-100': theme === 'light' }">
+                            <div class="w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center text-white">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 12c0 1.77.46 3.45 1.28 4.95L2 22l5.13-1.35c1.45.75 3.08 1.15 4.8 1.15 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zM9.53 8.5c.23-.24.53-.38.83-.38.3 0 .58.09.8.28l.1.11.02.03c.23.24.23.61 0 .85l-1.3 1.29c-.23.24-.23.62 0 .86l2.43 2.43c.24.24.62.24.86 0l1.29-1.3c.24-.23.61-.23.85 0l.03.02.11.1c.19.22.28.5.28.8 0 .3-.14.6-.38.83l-1.68 1.68c-.24.23-.54.37-.87.37s-.63-.14-.86-.38l-3.32-3.32a.62.62 0 010-.86l3.32-3.32z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xl font-semibold">WhatsApp</span>
+                        </a>
+                        <a
+                            href="https://facebook.com/habbopodcast"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:shadow-lg transform hover:translate-y-[-2px] card-hover"
+                            :class="{
+                                'bg-gray-800': theme === 'dark',
+                                'bg-amber-100': theme === 'classic',
+                                'bg-white': theme === 'light'
+                            }"
+                        >
+                            <div class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.983h-1.5c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xl font-semibold">Facebook</span>
+                        </a>
+                        <a
+                            href="https://instagram.com/habbopodcast" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:shadow-lg transform hover:translate-y-[-2px] card-hover" :class="{ 'bg-gray-700': theme === 'dark', 'bg-amber-50': theme === 'classic', 'bg-gray-100': theme === 'light' }">
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 flex items-center justify-center text-white">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span class="text-xl font-semibold">Instagram</span>
+                        </a>
+                        <a
+                            href="https://twitter.com/habbopodcast" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 hover:shadow-lg transform hover:translate-y-[-2px] card-hover" :class="{
+                                'bg-gray-700': theme === 'dark',
+                                'bg-amber-50': theme === 'classic',
+                                'bg-gray-100': theme === 'light'
+                            }">
+                            <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                                <!-- # MODIFICACIÓN: SVG actualizado al logo de X -->
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </div>
+                            <!-- # MODIFICACIÓN: Texto actualizado -->
+                            <span class="text-xl font-semibold">X (Twitter)</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="rounded-2xl p-8" :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white': theme === 'light'
+                }">
+                    <h3 class="text-2xl font-bold mb-8" x-text="t.sendUsMessage"></h3>
+                    <form class="space-y-6" @submit.prevent="
+                        const formData = new FormData($event.target);
+                        const message = `Nombre: ${formData.get('name')}\nEmail: ${formData.get('email')}\nMensaje: ${formData.get('message')}`;
+                        window.open(`https://wa.me/5584785119?text=${encodeURIComponent(message)}`, '_blank');
+                    ">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }">Nombre</label>
+                            <input
+                                type="text"
+                                name="name"
+                                required
+                                class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                :class="{
+                                    'bg-gray-700 border-gray-600 text-white focus:ring-cyan-400 focus:ring-offset-gray-900': theme === 'dark',
+                                    'bg-amber-50 border-amber-300 text-amber-900 focus:ring-cyan-400 focus:ring-offset-amber-100': theme === 'classic',
+                                    'bg-white border-gray-300 text-gray-900 focus:ring-cyan-400 focus:ring-offset-white': theme === 'light'
+                                }"
+                                placeholder="Tu nombre completo"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                required
+                                class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                :class="{
+                                    'bg-gray-700 border-gray-600 text-white focus:ring-cyan-400 focus:ring-offset-gray-900': theme === 'dark',
+                                    'bg-amber-50 border-amber-300 text-amber-900 focus:ring-cyan-400 focus:ring-offset-amber-100': theme === 'classic',
+                                    'bg-white border-gray-300 text-gray-900 focus:ring-cyan-400 focus:ring-offset-white': theme === 'light'
+                                }"
+                                placeholder="tu@email.com"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }">Mensaje</label>
+                            <textarea
+                                name="message"
+                                required
+                                rows="6"
+                                class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                :class="{
+                                    'bg-gray-700 border-gray-600 text-white focus:ring-cyan-400 focus:ring-offset-gray-900': theme === 'dark',
+                                    'bg-amber-50 border-amber-300 text-amber-900 focus:ring-cyan-400 focus:ring-offset-amber-100': theme === 'classic',
+                                    'bg-white border-gray-300 text-gray-900 focus:ring-cyan-400 focus:ring-offset-white': theme === 'light'
+                                }"
+                                placeholder="Escribe tu mensaje aquí..."
+                            ></textarea>
+                        </div>
+                        <button
+                            type="submit"
+                            class="w-full py-4 text-lg font-semibold rounded"
+                            :class="{
+                                'bg-gradient-to-r from-cyan-400 to-blue-600 text-white': color === 'blue',
+                                'bg-gradient-to-r from-purple-400 to-pink-600 text-white': color === 'purple',
+                                'bg-gradient-to-r from-red-400 to-orange-600 text-white': color === 'red',
+                                'bg-gradient-to-r from-pink-400 to-rose-600 text-white': color === 'pink',
+                                'bg-gradient-to-r from-green-400 to-emerald-600 text-white': color === 'green',
+                                'bg-gradient-to-r from-yellow-400 to-amber-600 text-white': color === 'yellow'
+                            }"
+                            x-text="t.post"
+                        ></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8" :class="{
+        'bg-gray-900 border-t border-gray-800': theme === 'dark',
+        'bg-amber-200 border-t border-amber-300': theme === 'classic',
+        'bg-white border-t border-gray-200': theme === 'light'
+    }">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="mb-6 md:mb-0">
+                    <div class="font-bold text-2xl text-cyan-400" :class="{
+                        'text-cyan-400': color === 'blue',
+                        'text-purple-400': color === 'purple',
+                        'text-red-400': color === 'red',
+                        'text-pink-400': color === 'pink',
+                        'text-green-400': color === 'green',
+                        'text-yellow-400': color === 'yellow'
+                    }">
+                        Hayato<span class="text-white">Sound</span>
+                    </div>
+                    <p class="mt-2" :class="{
+                        'text-gray-400': theme === 'dark',
+                        'text-amber-800': theme === 'classic',
+                        'text-gray-600': theme === 'light'
+                    }" x-text="t.footerText"></p>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <template x-for="c in ['blue', 'purple', 'red', 'pink', 'green', 'yellow']" :key="c">
+                        <button
+                            @click="color = c"
+                            class="w-6 h-6 rounded-full transition-transform duration-200 hover:scale-125"
+                            :class="{
+                                'bg-gradient-to-r from-cyan-400 to-blue-600': c === 'blue',
+                                'bg-gradient-to-r from-purple-400 to-pink-600': c === 'purple',
+                                'bg-gradient-to-r from-red-400 to-orange-600': c === 'red',
+                                'bg-gradient-to-r from-pink-400 to-rose-600': c === 'pink',
+                                'bg-gradient-to-r from-green-400 to-emerald-600': c === 'green',
+                                'bg-gradient-to-r from-yellow-400 to-amber-600': c === 'yellow',
+                                'ring-2 ring-white': color === c
+                            }"
+                            :title="c.charAt(0).toUpperCase() + c.slice(1)"
+                        ></button>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to top button only -->
+    <button
+        x-show="showScrollTop"
+        @click="scrollToTop"
+        class="fixed bottom-8 right-8 p-4 rounded-full text-white shadow-2xl transition-all duration-300 hover:scale-110 transform"
+        :class="{
+            'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+            'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+            'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+            'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+            'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+            'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+        }"
+    >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <!-- Post Detail Modal -->
+    <div x-show="selectedPodcast && selectedPodcast.isPost" class="fixed inset-0 z-50 overflow-y-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" @click="selectedPodcast = null">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div 
+                class="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full max-h-screen overflow-y-auto"
+                :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white': theme === 'light'
+                }"
+                @click.outside="selectedPodcast = null"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+                <div class="absolute top-4 right-4 z-10">
+                    <button
+                        @click="selectedPodcast = null"
+                        class="text-gray-400 hover:text-white transition-colors bg-black bg-opacity-30 p-2 rounded-full"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div>
+                    <img
+                        :src="selectedPodcast.banner"
+                        :alt="selectedPodcast.title"
+                        class="w-full h-80 object-cover"
+                        onerror="this.onerror=null;this.src='https://placehold.co/800x400/1f2937/6b7280?text=Imagen+no+disponible';"
+                    />
+                    <div class="p-8" :class="{
+                        'bg-gray-800': theme === 'dark',
+                        'bg-amber-100': theme === 'classic',
+                        'bg-white': theme === 'light'
+                    }">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                            <div>
+                                <span class="inline-block px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-cyan-400 to-blue-600 text-white mb-4" :class="{
+                                    'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue',
+                                    'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                                    'bg-gradient-to-r from-red-400 to-orange-600': color === 'red',
+                                    'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                                    'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green',
+                                    'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                                }">
+                                    <span x-text="`${t.category}: ${selectedPodcast.category}`"></span>
+                                </span>
+                                <h1 class="text-4xl font-bold mb-2" x-text="selectedPodcast.title"></h1>
+                                <div class="flex items-center text-lg" :class="{
+                                    'text-gray-400': theme === 'dark',
+                                    'text-amber-600': theme === 'classic',
+                                    'text-gray-500': theme === 'light'
+                                }">
+                                    <span x-text="`${t.by} ${selectedPodcast.author}`"></span>
+                                    <span class="mx-2">•</span>
+                                    <span x-text="`${t.postedOn} ${selectedPodcast.date}`"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4 mt-4 sm:mt-0">
+                                <button
+                                    @click="toggleLike(selectedPodcast.id)"
+                                    class="flex items-center space-x-2"
+                                    :class="{
+                                        'text-cyan-400': selectedPodcast.liked && color === 'blue',
+                                        'text-purple-400': selectedPodcast.liked && color === 'purple',
+                                        'text-red-400': selectedPodcast.liked && color === 'red',
+                                        'text-pink-400': selectedPodcast.liked && color === 'pink',
+                                        'text-green-400': selectedPodcast.liked && color === 'green',
+                                        'text-yellow-400': selectedPodcast.liked && color === 'yellow',
+                                        'text-gray-400': !selectedPodcast.liked
+                                    }"
+                                >
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="{
+                                        'bg-cyan-500': selectedPodcast.liked && color === 'blue',
+                                        'bg-purple-500': selectedPodcast.liked && color === 'purple',
+                                        'bg-red-500': selectedPodcast.liked && color === 'red',
+                                        'bg-pink-500': selectedPodcast.liked && color === 'pink',
+                                        'bg-green-500': selectedPodcast.liked && color === 'green',
+                                        'bg-yellow-500': selectedPodcast.liked && color === 'yellow',
+                                        'bg-gray-700': !selectedPodcast.liked
+                                    }">
+                                        <svg class="w-5 h-5" :fill="selectedPodcast.liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="font-semibold" x-text="selectedPodcast.likes"></span>
+                                </button>
+                                
+                                <div class="flex items-center space-x-2 text-gray-400">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center" :class="{
+                                        'bg-gray-700': theme === 'dark',
+                                        'bg-amber-200': theme === 'classic',
+                                        'bg-gray-200': theme === 'light'
+                                    }">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                        </svg>
+                                    </div>
+                                    <span class="font-semibold" x-text="selectedPodcast.commentData.length"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center mb-8">
+                            <img :src="selectedPodcast.userAvatar" :alt="selectedPodcast.author" class="w-14 h-14 rounded-full mr-4" onerror="this.onerror=null;this.src='https://placehold.co/56x56/1f2937/6b7280?text=U';"/>
+                            <div>
+                                <p class="text-xl font-semibold" x-text="selectedPodcast.author"></p>
+                                <p class="text-sm" :class="{
+                                    'text-gray-400': theme === 'dark',
+                                    'text-amber-600': theme === 'classic',
+                                    'text-gray-500': theme === 'light'
+                                }">Miembro desde 2020</p>
+                            </div>
+                        </div>
+                        
+                        <div class="prose prose-lg max-w-none mb-8">
+                            <div class="leading-relaxed space-y-4" :class="{
+                                'text-gray-300': theme === 'dark',
+                                'text-amber-800': theme === 'classic',
+                                'text-gray-700': theme === 'light'
+                            }">
+                                <template x-for="paragraph in selectedPodcast.content.split('\n\n')" :key="paragraph">
+                                    <p x-text="paragraph"></p>
+                                </template>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <template x-for="img in selectedPodcast.images" :key="img">
+                                <div class="rounded-xl overflow-hidden shadow-lg">
+                                    <img
+                                        :src="img"
+                                        :alt="`Post image`"
+                                        class="w-full h-72 object-cover hover:scale-105 transition-transform duration-300"
+                                        onerror="this.onerror=null;this.src='https://placehold.co/400x300/1f2937/6b7280?text=Imagen+no+disponible';"
+                                    />
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <!-- # MODIFICACIÓN: Formulario de comentarios -->
+                        <div class="rounded-2xl p-6 mb-6" :class="{
+                            'bg-gray-700': theme === 'dark', 'bg-amber-50': theme === 'classic', 'bg-gray-100': theme === 'light'
+                        }">
+                            <h3 class="text-2xl font-bold mb-4" x-text="t.comments"></h3>
+                            <textarea
+                                :id="`comment-post-${selectedPodcast.id}`"
+                                :placeholder="t.addComment"
+                                class="w-full p-4 rounded-xl border focus:outline-none focus:ring-2"
+                                :class="{
+                                    'bg-gray-800 border-gray-600 text-white focus:ring-cyan-400 focus:ring-offset-gray-900': theme === 'dark',
+                                    'bg-amber-100 border-amber-300 text-amber-900 focus:ring-cyan-400 focus:ring-offset-amber-100': theme === 'classic',
+                                    'bg-white border-gray-300 text-gray-900 focus:ring-cyan-400 focus:ring-offset-white': theme === 'light'
+                                }"
+                                rows="3"
+                            ></textarea>
+                            <div class="flex justify-end mt-4">
+                                <button
+                                    @click="showCommentModal({ type: 'post', id: selectedPodcast.id })"
+                                    class="px-6 py-3 font-semibold rounded"
+                                    :class="{
+                                        'bg-gradient-to-r from-cyan-400 to-blue-600 text-white': color === 'blue',
+                                        'bg-gradient-to-r from-purple-400 to-pink-600 text-white': color === 'purple',
+                                        'bg-gradient-to-r from-red-400 to-orange-600 text-white': color === 'red',
+                                        'bg-gradient-to-r from-pink-400 to-rose-600 text-white': color === 'pink',
+                                        'bg-gradient-to-r from-green-400 to-emerald-600 text-white': color === 'green',
+                                        'bg-gradient-to-r from-yellow-400 to-amber-600 text-white': color === 'yellow'
+                                    }"
+                                    x-text="t.post"
+                                ></button>
+                            </div>
+                        </div>
+                        
+                        <!-- # MODIFICACIÓN: Visualización de Comentarios Dinámicos -->
+                        <div class="space-y-6">
+                            <template x-for="(comment, index) in selectedPodcast.commentData" :key="index">
+                                <div class="rounded-xl p-6" :class="{
+                                    'bg-gray-700': theme === 'dark', 'bg-amber-50': theme === 'classic', 'bg-gray-100': theme === 'light'
+                                }">
+                                    <div class="flex items-start">
+                                        <img :src="`https://www.habbo.es/habbo-imaging/avatarimage?user=${comment.user}&direction=2&head_direction=3&gesture=sml&action=wav`" :alt="comment.user" class="w-12 h-12 mr-4" onerror="this.onerror=null;this.src='https://placehold.co/48x48/1f2937/6b7280?text=U';"/>
+                                        <div class="flex-1">
+                                            <div class="flex items-center mb-2">
+                                                <h4 class="font-semibold" x-text="comment.user"></h4>
+                                                <span class="ml-2 text-sm" :class="{
+                                                    'text-gray-400': theme === 'dark', 'text-amber-600': theme === 'classic', 'text-gray-500': theme === 'light'
+                                                }">
+                                                    • Recién comentado
+                                                </span>
+                                            </div>
+                                            <p :class="{
+                                                'text-gray-300': theme === 'dark', 'text-amber-800': theme === 'classic', 'text-gray-700': theme === 'light'
+                                            }" x-text="comment.text"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- # MODIFICACIÓN: Modal de 'Ver todos' los Podcasts -->
+    <div x-show="showAllPodcasts" class="fixed inset-0 z-50 overflow-y-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" @click="showAllPodcasts = false">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div 
+                class="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full max-h-[90vh] overflow-y-auto"
+                :class="{ 'bg-gray-800': theme === 'dark', 'bg-amber-100': theme === 'classic', 'bg-white': theme === 'light' }"
+                @click.outside="showAllPodcasts = false"
+                x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+                <div class="p-8">
+                    <div class="flex justify-between items-center mb-8">
+                         <h2 class="text-3xl font-bold" :class="{
+                            'text-cyan-400': color === 'blue', 'text-purple-400': color === 'purple', 'text-red-400': color === 'red',
+                            'text-pink-400': color === 'pink', 'text-green-400': color === 'green', 'text-yellow-400': color === 'yellow'
+                        }" x-text="t.allPodcasts"></h2>
+                        <button @click="showAllPodcasts = false" class="text-gray-400 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="space-y-6">
+                        <template x-for="podcast in podcasts" :key="podcast.id">
+                            <div class="flex items-center p-4 rounded-xl card-hover" :class="{ 'bg-gray-900': theme === 'dark', 'bg-amber-50': theme === 'classic', 'bg-gray-100': theme === 'light' }">
+                                <img :src="podcast.thumbnail" :alt="podcast.title" class="w-32 h-20 object-cover rounded-lg mr-6" onerror="this.onerror=null;this.src='https://placehold.co/128x80/1f2937/6b7280?text=IMG';"/>
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold" x-text="podcast.title"></h3>
+                                    <p class="text-sm" :class="{ 'text-gray-400': theme==='dark', 'text-amber-700': theme==='classic', 'text-gray-600': theme==='light' }" x-text="podcast.date"></p>
+                                </div>
+                                <button @click="selectedPodcast = podcast; showAllPodcasts = false" class="px-5 py-2.5 font-semibold rounded text-white" :class="{
+                                    'bg-gradient-to-r from-cyan-400 to-blue-600': color === 'blue', 'bg-gradient-to-r from-purple-400 to-pink-600': color === 'purple',
+                                    'bg-gradient-to-r from-red-400 to-orange-600': color === 'red', 'bg-gradient-to-r from-pink-400 to-rose-600': color === 'pink',
+                                    'bg-gradient-to-r from-green-400 to-emerald-600': color === 'green', 'bg-gradient-to-r from-yellow-400 to-amber-600': color === 'yellow'
+                                }" x-text="t.playNow"></button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Podcast Player Modal -->
+    <div x-show="selectedPodcast && !selectedPodcast.isPost && !selectedPodcast.isAllForums" class="fixed inset-0 z-50 overflow-y-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" @click="selectedPodcast = null">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div 
+                class="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full max-h-screen overflow-y-auto"
+                :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white': theme === 'light'
+                }"
+                @click.outside="selectedPodcast = null"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+                <div class="absolute top-4 right-4 z-10">
+                    <button
+                        @click="selectedPodcast = null"
+                        class="text-gray-400 hover:text-white transition-colors bg-black bg-opacity-30 p-2 rounded-full"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div>
+                    <div class="aspect-w-16 aspect-h-9 bg-black">
+                        <iframe
+                            :src="`https://www.youtube.com/embed/${selectedPodcast.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&cc_load_policy=1&fs=1&disablekb=1`"
+                            :title="selectedPodcast.title"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            class="w-full h-96 md:h-[500px]"
+                        ></iframe>
+                    </div>
+                    <div class="p-8" :class="{
+                        'bg-gray-800': theme === 'dark',
+                        'bg-amber-100': theme === 'classic',
+                        'bg-white': theme === 'light'
+                    }">
+                        <h2 class="text-3xl font-bold mb-4" x-text="selectedPodcast.title"></h2>
+                        <p class="text-lg mb-4" :class="{
+                            'text-gray-400': theme === 'dark',
+                            'text-amber-600': theme === 'classic',
+                            'text-gray-500': theme === 'light'
+                        }" x-text="selectedPodcast.date"></p>
+                        <p class="text-lg leading-relaxed" :class="{
+                            'text-gray-300': theme === 'dark',
+                            'text-amber-800': theme === 'classic',
+                            'text-gray-700': theme === 'light'
+                        }" x-text="selectedPodcast.description"></p>
+                        <div class="mt-6">
+                            <button
+                                @click="window.open(`https://www.youtube.com/watch?v=${selectedPodcast.youtubeId}`, '_blank')"
+                                class="px-6 py-3 font-semibold rounded"
+                                :class="{
+                                    'bg-gradient-to-r from-cyan-400 to-blue-600 text-white': color === 'blue',
+                                    'bg-gradient-to-r from-purple-400 to-pink-600 text-white': color === 'purple',
+                                    'bg-gradient-to-r from-red-400 to-orange-600 text-white': color === 'red',
+                                    'bg-gradient-to-r from-pink-400 to-rose-600 text-white': color === 'pink',
+                                    'bg-gradient-to-r from-green-400 to-emerald-600 text-white': color === 'green',
+                                    'bg-gradient-to-r from-yellow-400 to-amber-600 text-white': color === 'yellow'
+                                }"
+                                x-text="'Ver en YouTube'"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Username Modal -->
+    <div x-show="showUsernameModal" class="fixed inset-0 z-50 overflow-y-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" @click="showUsernameModal = false">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div 
+                class="inline-block align-bottom rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+                :class="{
+                    'bg-gray-800': theme === 'dark',
+                    'bg-amber-100': theme === 'classic',
+                    'bg-white': theme === 'light'
+                }"
+                @click.outside="showUsernameModal = false"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            >
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold mb-4" x-text="t.enterUsername"></h3>
+                    <p class="mb-6" :class="{
+                        'text-gray-300': theme === 'dark',
+                        'text-amber-800': theme === 'classic',
+                        'text-gray-700': theme === 'light'
+                    }" x-text="t.habboUsername"></p>
+                    
+                    <form @submit.prevent="addComment($event)" class="space-y-4">
+                        <input
+                            type="text"
+                            x-model="commentUsername"
+                            placeholder="Tu nombre"
+                            class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+                            :class="{
+                                'bg-gray-700 border-gray-600 text-white focus:ring-cyan-400 focus:ring-offset-gray-900': theme === 'dark',
+                                'bg-amber-50 border-amber-300 text-amber-900 focus:ring-cyan-400 focus:ring-offset-amber-100': theme === 'classic',
+                                'bg-white border-gray-300 text-gray-900 focus:ring-cyan-400 focus:ring-offset-white': theme === 'light'
+                            }"
+                            required
+                        />
+                        
+                        <div class="flex justify-end space-x-4">
+                            <button
+                                type="button"
+                                @click="showUsernameModal = false"
+                                class="px-6 py-3 rounded transition-colors"
+                                :class="{
+                                    'bg-gray-800 border border-cyan-400': theme === 'dark' && color === 'blue',
+                                    'bg-gray-800 border border-purple-400': theme === 'dark' && color === 'purple',
+                                    'bg-gray-800 border border-red-400': theme === 'dark' && color === 'red',
+                                    'bg-gray-800 border border-pink-400': theme === 'dark' && color === 'pink',
+                                    'bg-gray-800 border border-green-400': theme === 'dark' && color === 'green',
+                                    'bg-gray-800 border border-yellow-400': theme === 'dark' && color === 'yellow',
+                                    'bg-amber-100 border border-amber-300': theme === 'classic',
+                                    'bg-white border border-gray-300': theme === 'light'
+                                }"
+                                x-text="t.cancel"
+                            ></button>
+                            <button
+                                type="submit"
+                                class="px-6 py-3 font-semibold rounded"
+                                :class="{
+                                    'bg-gradient-to-r from-cyan-400 to-blue-600 text-white': color === 'blue',
+                                    'bg-gradient-to-r from-purple-400 to-pink-600 text-white': color === 'purple',
+                                    'bg-gradient-to-r from-red-400 to-orange-600 text-white': color === 'red',
+                                    'bg-gradient-to-r from-pink-400 to-rose-600 text-white': color === 'pink',
+                                    'bg-gradient-to-r from-green-400 to-emerald-600 text-white': color === 'green',
+                                    'bg-gradient-to-r from-yellow-400 to-amber-600 text-white': color === 'yellow'
+                                }"
+                                x-text="t.submit"
+                            ></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add scroll effect
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('app', () => ({
+                init() {
+                    window.addEventListener('scroll', () => {
+                        this.showScrollTop = window.scrollY > 300;
+                        
+                        // Update active section based on scroll
+                        const sections = [
+                            { ref: 'home', id: 'home' },
+                            { ref: 'podcasts', id: 'podcasts' },
+                            { ref: 'interviews', id: 'interviews' },
+                            { ref: 'faq', id: 'faq' },
+                            { ref: 'about', id: 'about' },
+                            { ref: 'contact', id: 'contact' }
+                        ];
+                        
+                        let currentSection = 'home';
+                        for (const section of sections) {
+                            const element = document.getElementById(section.ref);
+                            if (element) {
+                                const rect = element.getBoundingClientRect();
+                                if (rect.top <= 100 && rect.bottom >= 100) {
+                                    currentSection = section.id;
+                                    break;
+                                }
+                            }
+                        }
+                        this.activeSection = currentSection;
+                    });
+                }
+            }));
+        });
+    </script>
+</body>
+</html>
